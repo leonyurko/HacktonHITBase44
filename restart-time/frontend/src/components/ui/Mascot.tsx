@@ -26,7 +26,7 @@ export default function Mascot({ mood = 'idle', size = 72, bob = false }: Props)
       height={size}
       viewBox="0 0 80 80"
       role="img"
-      aria-label="Restart mascot"
+      aria-label="GalGal mascot"
       style={{ display: 'block', overflow: 'visible', animation }}
     >
       {/* soft outer glow */}

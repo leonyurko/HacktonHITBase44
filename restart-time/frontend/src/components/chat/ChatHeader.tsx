@@ -62,7 +62,7 @@ export default function ChatHeader({ language, onBack, startedAt }: Props) {
             color: 'var(--primary)',
           }}
         >
-          Restart
+          GalGal
         </div>
         <div style={{ width: 44 }} />
       </header>

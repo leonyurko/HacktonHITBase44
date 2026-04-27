@@ -2,7 +2,7 @@ import type { Language } from './types';
 
 const STRINGS = {
   en: {
-    appTitle: 'Restart Time',
+    appTitle: 'GalGal',
     tagline: 'a calmer way to plan your day',
     enterEmail: 'email',
     sendLink: 'send me a link',
@@ -44,7 +44,7 @@ const STRINGS = {
     },
   },
   he: {
-    appTitle: 'Restart Time',
+    appTitle: 'GalGal',
     tagline: 'דרך רגועה לתכנן את היום',
     enterEmail: 'מייל',
     sendLink: 'שלח לי קישור',

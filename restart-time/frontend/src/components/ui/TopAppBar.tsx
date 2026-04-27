@@ -39,7 +39,7 @@ export default function TopAppBar({ email, language, onLangToggle, onAvatarClick
           letterSpacing: '-0.01em',
         }}
       >
-        Restart
+        GalGal
       </div>
       <button
         onClick={onLangToggle}
