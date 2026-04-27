@@ -122,19 +122,22 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
         </div>
       </section>
 
-      {/* Mode picker (single card while on-demand help is disabled) */}
-      <section style={{ marginBottom: 'var(--space-lg)' }}>
-        <ModeCard
+      {/* Mode picker — centered focal-point button. Brand-gradient, light
+          decorative blob in the corner, large icon, prominent CTA. */}
+      <section
+        style={{
+          marginBottom: 'var(--space-lg)',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <PlanButton
           onClick={onPlan}
-          iconName="calendar_today"
-          iconBg="var(--primary-container)"
-          iconColor="var(--on-primary-container)"
-          bg="var(--surface-container)"
           title={settings.language === 'he' ? 'בוא נתכנן' : "let's plan"}
           subtitle={
             settings.language === 'he'
-              ? 'נסדר את היום, בקצב שלך'
-              : "let's lay out the day, at your pace"
+              ? 'נסדר את היום בקצב שלך'
+              : 'lay out the day at your pace'
           }
         />
       </section>
@@ -408,65 +411,92 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
   );
 }
 
-function ModeCard({
+function PlanButton({
   onClick,
-  iconName,
-  iconBg,
-  iconColor,
-  bg,
   title,
   subtitle,
 }: {
   onClick: () => void;
-  iconName: string;
-  iconBg: string;
-  iconColor: string;
-  bg: string;
   title: string;
   subtitle: string;
 }) {
   return (
     <button
       onClick={onClick}
+      className="lift"
       style={{
-        backgroundColor: bg,
-        border: '1.5px solid var(--border)',
+        // Center, capped width — focal point of the home screen
+        width: '100%',
+        maxWidth: 360,
+        minHeight: 200,
+        padding: 'var(--space-6) var(--space-5)',
+        // Brand-gradient body (sky-blue → lilac)
+        background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)',
+        color: 'var(--on-primary)',
+        border: 'none',
         borderRadius: 'var(--radius-2xl)',
-        padding: 'var(--space-5)',
-        minHeight: 160,
+        boxShadow: 'var(--shadow-lg)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        gap: 'var(--space-sm)',
-        textAlign: 'start',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 'var(--space-3)',
+        textAlign: 'center',
         cursor: 'pointer',
-        boxShadow: 'var(--shadow-sm)',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      {/* Soft decorative blob in the corner */}
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          insetInlineEnd: -40,
+          top: -40,
+          width: 140,
+          height: 140,
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.18)',
+          filter: 'blur(20px)',
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Big icon in a translucent circle */}
       <div
         aria-hidden
         style={{
-          width: 48,
-          height: 48,
+          width: 64,
+          height: 64,
           borderRadius: '50%',
-          backgroundColor: iconBg,
-          color: iconColor,
+          backgroundColor: 'rgba(255,255,255,0.22)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Icon name={iconName} size={24} filled color={iconColor} />
+        <Icon name="auto_awesome" size={32} filled color="white" />
       </div>
-      <div>
-        <h2 style={{ margin: 0, marginBottom: 'var(--space-1)' }}>{title}</h2>
+      <div style={{ position: 'relative' }}>
+        <h2
+          style={{
+            margin: 0,
+            marginBottom: 'var(--space-1)',
+            color: 'white',
+            fontSize: 24,
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          {title}
+        </h2>
         <p
           style={{
             margin: 0,
             fontFamily: 'var(--font-body)',
-            color: 'var(--text-muted)',
+            color: 'rgba(255,255,255,0.88)',
             fontSize: 'var(--text-base)',
+            lineHeight: 1.4,
           }}
         >
           {subtitle}
