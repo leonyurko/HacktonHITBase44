@@ -75,19 +75,55 @@ class StepResult:
 # Intent parsing (pre-LLM — simple keyword matching). Cheap and fast.
 # --------------------------------------------------------------------------
 
+# All patterns require word-level deliberateness — bare verb fragments like
+# "להוריד" or single-letter words inside other words must NOT match. The
+# fallback when no pattern matches is 'still_open' (the safest), so it's OK
+# for these to be conservative.
+
 _DONE_PATTERNS_EN = [r"\b(yes|yep|did|done|finished|completed)\b"]
-_DONE_PATTERNS_HE = [r"כן", r"עשיתי", r"סיימתי", r"גמרתי", r"בוצע"]
+_DONE_PATTERNS_HE = [
+    r"\bכן\b",       # standalone "yes"
+    r"עשיתי",
+    r"סיימתי",
+    r"גמרתי",
+    r"בוצע",
+]
 
 _NOT_DONE_PATTERNS_EN = [
     r"\b(no|not yet|didn'?t|haven'?t|couldn'?t|still|tomorrow|later)\b"
 ]
-_NOT_DONE_PATTERNS_HE = [r"לא הצלחתי", r"לא עוד", r"מחר", r"עוד לא", r"דחיתי"]
+_NOT_DONE_PATTERNS_HE = [r"לא הצלחתי", r"לא עוד", r"\bמחר\b", r"עוד לא", r"דחיתי"]
 
 _DEFER_PATTERNS_EN = [r"\b(tomorrow|later|push|defer|move)\b"]
-_DEFER_PATTERNS_HE = [r"מחר", r"לדחות", r"להזיז", r"אחר[\-\s]?כך"]
+_DEFER_PATTERNS_HE = [
+    r"\bמחר\b",                   # standalone "tomorrow"
+    r"לדחות",
+    r"להזיז\s+(את\s+)?(זה|זאת)",  # "move this" only
+    r"אחר[\-\s]?כך",
+]
 
-_DROP_PATTERNS_EN = [r"\b(drop|cancel|forget|nevermind|never\s*mind|remove)\b"]
-_DROP_PATTERNS_HE = [r"לבטל", r"להסיר", r"לוותר", r"להוריד", r"שכח", r"שכחי"]
+# DROP is the most dangerous misclassification — it loses tasks. Patterns
+# require a deliberate drop intent (object word like "this", "the task",
+# "from the list", etc.) — bare polysemous verbs like "להוריד" don't fire.
+_DROP_PATTERNS_EN = [
+    r"\b(drop|remove|cancel)\s+(it|this|that|the\s+task)\b",
+    r"\bnever\s*mind\b",
+    r"\bnvm\b",
+    r"\bforget\s+(it|this|that|about\s+it)\b",
+    r"\b(not\s+relevant|don'?t\s+need\s+(it|this))\b",
+]
+_DROP_PATTERNS_HE = [
+    r"בטל\s+(את\s+)?(זה|זאת|המשימה)",      # cancel this/the task
+    r"לבטל\s+(את\s+)?(זה|זאת|המשימה)",
+    r"שכח\s+מ(זה|זאת|המשימה)",              # forget about this/it
+    r"שכחי\s+מ(זה|זאת|המשימה)",
+    r"תוריד\s+(את\s+)?(זה|זאת|המשימה)",     # take this off
+    r"תוריד\s+מהרשימה",                      # take off the list
+    r"להוריד\s+מהרשימה",
+    r"לוותר\s+על\s+(זה|זאת|המשימה)",
+    r"\bלא\s+רלוונטי\b",
+    r"כבר\s+לא\s+(צריך|רוצה)",
+]
 
 _NO_MORE_PATTERNS_EN = [
     r"\b(no|nope|done|enough|that'?s it|that\s+is\s+it|nothing)\b"
