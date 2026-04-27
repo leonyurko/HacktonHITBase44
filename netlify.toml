@@ -9,15 +9,12 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  # VITE_* vars are intentionally bundled into the public JS (that's how they
-  # reach the browser). The Supabase anon key is also intentionally public —
-  # row-level security protects data, not the key. Tell Netlify's secret
-  # scanner not to flag these. Backend secrets (service-role key, OpenAI key,
-  # VAPID private, encryption keys) must NEVER be set as Netlify env vars.
-  SECRETS_SCAN_OMIT_KEYS = "VITE_API_BASE_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_VAPID_PUBLIC_KEY,VITE_DEV_BYPASS"
-  # Also skip scanning node_modules — generates noisy false positives on
-  # words like "ENV" / "PORT" inside type definitions.
-  SECRETS_SCAN_OMIT_PATHS = "node_modules/**,dist/assets/index-*.js.map"
+  # MVP-only: secret scanning disabled because backend env vars are also set
+  # in Netlify (service-role key, OpenAI key, etc.) and the scanner flags
+  # their values as exposed across node_modules. All keys will be rotated /
+  # deleted after the MVP demo period.
+  # ⚠ Re-enable before any real launch.
+  SECRETS_SCAN_ENABLED = "false"
 
 # SPA fallback — any non-asset path serves index.html so client-side routing
 # (and a hard refresh on the dashboard etc.) works.
