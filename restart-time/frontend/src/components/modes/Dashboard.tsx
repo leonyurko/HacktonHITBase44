@@ -54,19 +54,37 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [showReminderForm, setShowReminderForm] = useState(false);
 
-  async function refresh() {
-    setLoading(true);
+  async function refresh(opts: { silent?: boolean } = {}) {
+    if (!opts.silent) setLoading(true);
     try {
       const [allTasks, rems] = await Promise.all([listAllTasks(), listReminders()]);
       setTasks(allTasks);
       setReminders(rems);
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
+  // Initial load.
   useEffect(() => {
     void refresh();
+  }, []);
+
+  // Refresh whenever the tab becomes visible again (user comes back from
+  // another browser tab) and on a 30s background tick. Both are silent —
+  // no loading flash so the UI stays calm.
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === 'visible') void refresh({ silent: true });
+    }
+    window.addEventListener('focus', onVisible);
+    document.addEventListener('visibilitychange', onVisible);
+    const id = setInterval(() => void refresh({ silent: true }), 30_000);
+    return () => {
+      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', onVisible);
+      clearInterval(id);
+    };
   }, []);
 
   const openTasks = tasks.filter((x) => x.state === 'open');
@@ -128,7 +146,10 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
             {settings.language === 'he' ? 'מה נשאר' : "what's left"}
           </h3>
           {loading ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>…</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+              <div className="skeleton" style={{ height: 56 }} />
+              <div className="skeleton" style={{ height: 56, opacity: 0.7 }} />
+            </div>
           ) : todayTasks.length === 0 ? (
             <p style={{ color: 'var(--text-muted)' }}>
               {settings.language === 'he'
@@ -334,7 +355,11 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
       {tab !== 'today' && (
         <>
           {loading ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>…</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+              <div className="skeleton" style={{ height: 64 }} />
+              <div className="skeleton" style={{ height: 64, opacity: 0.7 }} />
+              <div className="skeleton" style={{ height: 64, opacity: 0.4 }} />
+            </div>
           ) : tab === 'reminders' ? (
             reminders.length === 0 ? (
               <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>

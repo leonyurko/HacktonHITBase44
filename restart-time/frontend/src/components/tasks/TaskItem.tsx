@@ -100,11 +100,13 @@ export default function TaskItem({ task, language, onChange }: Props) {
 
   return (
     <div
+      className={editing ? '' : 'lift'}
       style={{
         padding: 'var(--space-3) var(--space-4)',
         backgroundColor: 'var(--bg-elevated)',
         border: '1.5px solid var(--border)',
-        borderRadius: 'var(--radius-md)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-sm)',
         opacity: task.state === 'dropped' || task.state === 'done' ? 0.65 : 1,
       }}
     >

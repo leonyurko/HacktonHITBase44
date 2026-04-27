@@ -50,11 +50,13 @@ export default function ReminderItem({ reminder, task, language, onChange }: Pro
 
   return (
     <div
+      className="lift"
       style={{
         padding: 'var(--space-3) var(--space-4)',
         backgroundColor: 'var(--bg-elevated)',
         border: '1.5px solid var(--border)',
-        borderRadius: 'var(--radius-md)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-sm)',
         display: 'flex',
         alignItems: 'flex-start',
         gap: 'var(--space-3)',

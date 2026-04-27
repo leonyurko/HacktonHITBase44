@@ -39,8 +39,9 @@ export default function TaskRowCompact({ task, onChange }: Omit<Props, 'language
 
   return (
     <div
+      className="lift"
       style={{
-        backgroundColor: 'var(--bg)',
+        backgroundColor: 'var(--bg-elevated)',
         border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-lg)',
         padding: 'var(--space-sm)',
@@ -48,6 +49,7 @@ export default function TaskRowCompact({ task, onChange }: Omit<Props, 'language
         alignItems: 'center',
         gap: 'var(--space-sm)',
         opacity: task.state === 'open' ? 1 : 0.6,
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <button
