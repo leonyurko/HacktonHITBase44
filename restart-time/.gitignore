@@ -1,0 +1,58 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+build/
+dist/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+*.log
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Audio dev artifacts
+*.webm
+*.opus
+*.mp3
+!backend/content/**/*.mp3
+
+# Restart corpus is private until consents are signed
+backend/content/restart/*.md
+!backend/content/restart/.gitkeep
+!backend/content/restart/README.md
+
+# DB exports / dumps
+*.sql.gz
+*.dump
+
+# Generated keys
+backend/keys/
+
+# Local Whisper model cache (~3GB)
+.whisper-models/
+
+# User audio recordings (host-local, not committed)
+recordings/
+
+# Misc
+.coverage
+htmlcov/
