@@ -85,7 +85,19 @@ def get_current_user(
     request: Request,
     settings: Settings = Depends(get_settings),
 ) -> AuthUser:
-    """FastAPI dependency: returns the authenticated user or raises 401."""
+    """FastAPI dependency: returns the authenticated user or raises 401.
+
+    Dev bypass: if DEV_USER_ID is set, return that user without checking the
+    Authorization header. The user must already exist in auth.users for FKs
+    to resolve. Used for local demos where login adds friction.
+    """
+    if settings.dev_user_id:
+        return AuthUser(
+            user_id=settings.dev_user_id,
+            email="dev@local",
+            role="authenticated",
+        )
+
     token = _extract_bearer(request)
     payload = _decode_supabase_jwt(token, settings)
     sub = payload.get("sub")

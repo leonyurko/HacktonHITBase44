@@ -145,6 +145,15 @@ async def apply_actions(
 
     for a in actions:
         if a.kind == "task":
+            # Defensive: drop trivial "task" titles like "hi", "ok", "yes" — these
+            # are artifacts of the model misclassifying greetings as tasks.
+            stripped = (a.title or "").strip()
+            if len(stripped) < 3 or stripped.lower() in {
+                "hi", "hey", "yo", "ok", "okay", "yes", "no", "sure",
+                "cool", "thanks", "thx", "היי", "כן", "לא", "טוב", "אוקיי",
+            }:
+                log.info("dropping_trivial_task", title=stripped)
+                continue
             row = (
                 sb.table("tasks")
                 .insert(

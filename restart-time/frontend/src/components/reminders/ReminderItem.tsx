@@ -53,7 +53,7 @@ export default function ReminderItem({ reminder, task, language, onChange }: Pro
       style={{
         padding: 'var(--space-3) var(--space-4)',
         backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
+        border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-md)',
         display: 'flex',
         alignItems: 'flex-start',

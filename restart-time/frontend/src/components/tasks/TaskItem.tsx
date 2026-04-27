@@ -6,6 +6,7 @@ import {
   patchTask,
 } from '../../core/tasks';
 import { detectLanguage } from '../../core/i18n';
+import { useCelebrate } from '../../core/feedback';
 import type { Language, Task, TaskSize } from '../../core/types';
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
   language: Language;
   onChange: () => void; // parent re-fetches the list
 }
+
+const POINTS_BY_SIZE: Record<TaskSize, number> = { tiny: 5, small: 10, medium: 20 };
 
 const SIZE_LABEL: Record<TaskSize, { en: string; he: string }> = {
   tiny: { en: 'tiny', he: 'מהירה' },
@@ -22,9 +25,9 @@ const SIZE_LABEL: Record<TaskSize, { en: string; he: string }> = {
 
 const STATE_BADGE: Record<Task['state'], { en: string; he: string; color: string }> = {
   open: { en: 'open', he: 'פתוחה', color: 'var(--text-muted)' },
-  done: { en: 'done', he: 'נסגרה', color: 'var(--accent-good)' },
+  done: { en: 'done', he: 'הושלמה', color: 'var(--accent-good)' },
   deferred: { en: 'deferred', he: 'למחר', color: 'var(--accent-amber)' },
-  dropped: { en: 'dropped', he: 'ירדה', color: 'var(--text-muted)' },
+  dropped: { en: 'dropped', he: 'הוסרה', color: 'var(--text-muted)' },
 };
 
 function tomorrowIso(): string {
@@ -35,6 +38,7 @@ function tomorrowIso(): string {
 
 export default function TaskItem({ task, language, onChange }: Props) {
   const titleLang = detectLanguage(task.title);
+  const celebrate = useCelebrate();
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [size, setSize] = useState<TaskSize | ''>(task.size ?? '');
@@ -61,6 +65,8 @@ export default function TaskItem({ task, language, onChange }: Props) {
     setBusy(true);
     try {
       await completeTask(task.id);
+      const points = POINTS_BY_SIZE[task.size ?? 'small'];
+      celebrate({ points });
       onChange();
     } finally {
       setBusy(false);
@@ -97,7 +103,7 @@ export default function TaskItem({ task, language, onChange }: Props) {
       style={{
         padding: 'var(--space-3) var(--space-4)',
         backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
+        border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-md)',
         opacity: task.state === 'dropped' || task.state === 'done' ? 0.65 : 1,
       }}
@@ -118,7 +124,7 @@ export default function TaskItem({ task, language, onChange }: Props) {
               disabled={busy}
               style={{
                 padding: 'var(--space-2) var(--space-3)',
-                border: '1px solid var(--border)',
+                border: '1.5px solid var(--border)',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--bg)',
                 color: 'var(--text)',

@@ -4,6 +4,7 @@ import { listReminders, type Reminder } from '../../core/reminders';
 import { daysThisMonthLabel } from '../../core/i18n';
 import type { Progress, Task, UserSettings } from '../../core/types';
 import Icon from '../ui/Icon';
+import Mascot from '../ui/Mascot';
 import TaskItem from '../tasks/TaskItem';
 import TaskForm from '../tasks/TaskForm';
 import TaskRowCompact from '../tasks/TaskRowCompact';
@@ -22,7 +23,7 @@ type TabKey = 'today' | 'all' | 'done' | 'reminders';
 const TAB_LABELS: Record<TabKey, { en: string; he: string }> = {
   today: { en: 'today', he: 'היום' },
   all: { en: 'all', he: 'הכל' },
-  done: { en: 'done', he: 'נסגרו' },
+  done: { en: 'done', he: 'הושלמו' },
   reminders: { en: 'reminders', he: 'תזכורות' },
 };
 
@@ -71,7 +72,6 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
   const openTasks = tasks.filter((x) => x.state === 'open');
   const todayTasks = tasks.filter((x) => x.state === 'open' || isDeferredForToday(x));
   const doneTasks = tasks.filter((x) => x.state === 'done');
-  const pendingReminders = reminders.filter((r) => r.status === 'pending');
 
   const taskById = new Map(tasks.map((x) => [x.id, x]));
 
@@ -85,12 +85,23 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
 
   return (
     <div style={{ paddingBottom: 'var(--space-md)' }}>
-      {/* Welcome */}
-      <section style={{ marginTop: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
-        <h1 style={{ marginBottom: 'var(--space-1)' }}>{greeting}</h1>
-        <p style={{ color: 'var(--text-muted)', margin: 0, fontFamily: 'var(--font-body)' }}>
-          {subhead}
-        </p>
+      {/* Welcome — mascot peeking next to greeting */}
+      <section
+        style={{
+          marginTop: 'var(--space-md)',
+          marginBottom: 'var(--space-lg)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-4)',
+        }}
+      >
+        <Mascot mood="idle" size={72} bob />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1 style={{ marginBottom: 'var(--space-1)' }}>{greeting}</h1>
+          <p style={{ color: 'var(--text-muted)', margin: 0, fontFamily: 'var(--font-body)' }}>
+            {subhead}
+          </p>
+        </div>
       </section>
 
       {/* Mode picker (single card while on-demand help is disabled) */}
@@ -145,9 +156,10 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
           <div
             style={{
               padding: 'var(--space-md)',
-              backgroundColor: 'var(--surface-container)',
-              borderRadius: 'var(--radius-xl)',
-              border: '1px solid var(--border)',
+              backgroundColor: 'var(--bg-elevated)',
+              borderRadius: 'var(--radius-2xl)',
+              border: '1.5px solid var(--border)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             <div
@@ -230,14 +242,6 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
       >
         {(['today', 'all', 'done', 'reminders'] as TabKey[]).map((k) => {
           const active = tab === k;
-          const count =
-            k === 'today'
-              ? todayTasks.length
-              : k === 'all'
-                ? openTasks.length
-                : k === 'done'
-                  ? doneTasks.length
-                  : pendingReminders.length;
           return (
             <button
               key={k}
@@ -258,11 +262,6 @@ export default function Dashboard({ settings, progress, onPlan }: Props) {
               }}
             >
               {TAB_LABELS[k][settings.language]}
-              {count > 0 && (
-                <span style={{ marginInlineStart: 6, color: 'var(--text-subtle)', fontSize: 12 }}>
-                  {count}
-                </span>
-              )}
             </button>
           );
         })}
@@ -406,9 +405,9 @@ function ModeCard({
       onClick={onClick}
       style={{
         backgroundColor: bg,
-        border: '1px solid var(--border)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--space-md)',
+        border: '1.5px solid var(--border)',
+        borderRadius: 'var(--radius-2xl)',
+        padding: 'var(--space-5)',
         minHeight: 160,
         display: 'flex',
         flexDirection: 'column',
@@ -417,7 +416,7 @@ function ModeCard({
         gap: 'var(--space-sm)',
         textAlign: 'start',
         cursor: 'pointer',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
       <div

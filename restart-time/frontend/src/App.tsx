@@ -5,23 +5,32 @@ import { apiGet, apiPatch } from './core/api';
 import type { Language, UserSettings, Progress } from './core/types';
 import MagicLink from './components/auth/MagicLink';
 import Dashboard from './components/modes/Dashboard';
+import LeaderboardView from './components/modes/LeaderboardView';
 import OnDemandView from './components/modes/OnDemandView';
 import PlanningView from './components/modes/PlanningView';
 import SettingsView from './components/modes/SettingsView';
-import GroundingButton from './components/grounding/GroundingButton';
+// import GroundingButton from './components/grounding/GroundingButton'; // hidden for now
 import TopAppBar from './components/ui/TopAppBar';
 import BottomNav, { type NavTab } from './components/ui/BottomNav';
+import { CelebrateProvider } from './core/feedback';
 
-type View = 'dashboard' | 'settings' | 'on_demand' | 'planning';
+type View = 'dashboard' | 'leaderboard' | 'settings' | 'on_demand' | 'planning';
+
+// Dev bypass: when VITE_DEV_BYPASS=true, the magic-link screen is skipped
+// and the app is rendered as if the user were signed in. The backend MUST
+// also be configured with DEV_USER_ID (auth dependency uses that user_id
+// for every request, no JWT check). Use only for local demos.
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS === 'true';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!DEV_BYPASS);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [view, setView] = useState<View>('dashboard');
 
   useEffect(() => {
+    if (DEV_BYPASS) return;
     getCurrentSession().then((s) => {
       setSession(s);
       setLoading(false);
@@ -38,7 +47,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!session) return;
+    if (!session && !DEV_BYPASS) return;
     void loadSettings();
   }, [session]);
 
@@ -54,7 +63,7 @@ export default function App() {
     return <div className="app-shell" />;
   }
 
-  if (!session) {
+  if (!session && !DEV_BYPASS) {
     return (
       <div className="app-shell">
         <MagicLink language={settings?.language ?? 'en'} />
@@ -68,7 +77,10 @@ export default function App() {
 
   const language = settings.language;
   const inChat = view === 'on_demand' || view === 'planning';
-  const navTab: NavTab = view === 'settings' ? 'settings' : 'home';
+  const navTab: NavTab =
+    view === 'settings' ? 'settings' :
+    view === 'leaderboard' ? 'leaderboard' :
+    'home';
 
   async function toggleLang() {
     const next: Language = language === 'en' ? 'he' : 'en';
@@ -79,10 +91,10 @@ export default function App() {
   }
 
   return (
-    <>
+    <CelebrateProvider language={language}>
       {!inChat && (
         <TopAppBar
-          email={session.user.email ?? null}
+          email={session?.user?.email ?? (DEV_BYPASS ? 'dev@local' : null)}
           language={language}
           onLangToggle={() => void toggleLang()}
           onAvatarClick={() => setView('settings')}
@@ -95,6 +107,13 @@ export default function App() {
             settings={settings}
             progress={progress}
             onPlan={() => setView('planning')}
+          />
+        )}
+        {view === 'leaderboard' && (
+          <LeaderboardView
+            language={language}
+            email={session?.user?.email ?? (DEV_BYPASS ? 'dev@local' : null)}
+            progress={progress}
           />
         )}
         {view === 'settings' && (
@@ -119,11 +138,15 @@ export default function App() {
         <BottomNav
           active={navTab}
           language={language}
-          onChange={(t) => setView(t === 'settings' ? 'settings' : 'dashboard')}
+          onChange={(t) => {
+            if (t === 'settings') setView('settings');
+            else if (t === 'leaderboard') setView('leaderboard');
+            else setView('dashboard');
+          }}
         />
       )}
 
-      <GroundingButton language={language} />
-    </>
+      {/* <GroundingButton language={language} />  // hidden for now */}
+    </CelebrateProvider>
   );
 }

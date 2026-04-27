@@ -10,5 +10,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    // Bind to 0.0.0.0 so the dev server is reachable over the Tailnet
+    // (Restart Time on phone → http://<laptop-tailnet-ip>:5173).
+    host: true,
   },
 });

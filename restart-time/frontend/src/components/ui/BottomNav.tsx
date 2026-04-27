@@ -1,7 +1,7 @@
 import Icon from './Icon';
 import type { Language } from '../../core/types';
 
-export type NavTab = 'home' | 'settings';
+export type NavTab = 'home' | 'leaderboard' | 'settings';
 
 interface Props {
   active: NavTab;
@@ -11,16 +11,18 @@ interface Props {
 
 const LABELS = {
   home: { en: 'Home', he: 'בית' },
+  leaderboard: { en: 'Top', he: 'טבלה' },
   settings: { en: 'Settings', he: 'הגדרות' },
 } as const;
 
 const ICONS: Record<NavTab, string> = {
   home: 'home',
+  leaderboard: 'leaderboard',
   settings: 'settings',
 };
 
 export default function BottomNav({ active, language, onChange }: Props) {
-  const tabs: NavTab[] = ['home', 'settings'];
+  const tabs: NavTab[] = ['home', 'leaderboard', 'settings'];
   return (
     <nav
       style={{

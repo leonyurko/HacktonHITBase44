@@ -39,9 +39,9 @@ export default function ChatHeader({ language, onBack, startedAt }: Props) {
           onClick={onBack}
           aria-label="back"
           style={{
-            minHeight: 40,
-            width: 40,
-            height: 40,
+            minHeight: 44,
+            width: 44,
+            height: 44,
             padding: 0,
             borderRadius: '50%',
             backgroundColor: 'transparent',
@@ -64,7 +64,7 @@ export default function ChatHeader({ language, onBack, startedAt }: Props) {
         >
           Restart
         </div>
-        <div style={{ width: 40 }} />
+        <div style={{ width: 44 }} />
       </header>
       {startedAt && (
         <div

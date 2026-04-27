@@ -51,7 +51,7 @@ export default function ReminderForm({ language, openTasks, onCreated, onCancel 
         style={{
           padding: 'var(--space-4)',
           backgroundColor: 'var(--bg-elevated)',
-          border: '1px solid var(--border)',
+          border: '1.5px solid var(--border)',
           borderRadius: 'var(--radius-md)',
         }}
       >
@@ -78,7 +78,7 @@ export default function ReminderForm({ language, openTasks, onCreated, onCancel 
       style={{
         padding: 'var(--space-4)',
         backgroundColor: 'var(--bg-elevated)',
-        border: '1px solid var(--border)',
+        border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-md)',
         display: 'flex',
         flexDirection: 'column',
@@ -92,7 +92,7 @@ export default function ReminderForm({ language, openTasks, onCreated, onCancel 
         required
         style={{
           padding: 'var(--space-2) var(--space-3)',
-          border: '1px solid var(--border)',
+          border: '1.5px solid var(--border)',
           borderRadius: 'var(--radius-md)',
           backgroundColor: 'var(--bg)',
           color: 'var(--text)',

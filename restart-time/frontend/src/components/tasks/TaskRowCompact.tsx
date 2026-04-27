@@ -6,7 +6,10 @@
 import { useState } from 'react';
 import { completeTask } from '../../core/tasks';
 import { detectLanguage } from '../../core/i18n';
-import type { Language, Task } from '../../core/types';
+import { useCelebrate } from '../../core/feedback';
+import type { Language, Task, TaskSize } from '../../core/types';
+
+const POINTS_BY_SIZE: Record<TaskSize, number> = { tiny: 5, small: 10, medium: 20 };
 
 interface Props {
   task: Task;
@@ -17,12 +20,15 @@ interface Props {
 export default function TaskRowCompact({ task, onChange }: Omit<Props, 'language'> & { language?: Language }) {
   const [busy, setBusy] = useState(false);
   const titleLang = detectLanguage(task.title);
+  const celebrate = useCelebrate();
 
   async function toggle() {
     if (busy || task.state !== 'open') return;
     setBusy(true);
     try {
       await completeTask(task.id);
+      const points = POINTS_BY_SIZE[task.size ?? 'small'];
+      celebrate({ points });
       onChange();
     } finally {
       setBusy(false);
@@ -35,7 +41,7 @@ export default function TaskRowCompact({ task, onChange }: Omit<Props, 'language
     <div
       style={{
         backgroundColor: 'var(--bg)',
-        border: '1px solid var(--border)',
+        border: '1.5px solid var(--border)',
         borderRadius: 'var(--radius-lg)',
         padding: 'var(--space-sm)',
         display: 'flex',

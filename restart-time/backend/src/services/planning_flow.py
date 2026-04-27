@@ -164,20 +164,20 @@ def _greet_fallback(language: Language, days_since: int | None) -> str:
 async def _llm_greet(language: Language, days_since: int | None) -> str:
     if language == "he":
         sys = (
-            "ברך את המשתמש בעברית במשפט אחד חם וקצר, בקול של חבר, בלי סימני קריאה. "
-            f"חלפו {days_since} ימים מאז השיחה הקודמת — תזכיר את זה ברוגע אם מתאים. "
-            "בלי 'שלום' פורמלי. בלי אימוג'י."
-            if days_since is not None and days_since >= 3
-            else "ברך את המשתמש בעברית במשפט אחד חם וקצר, בקול של חבר, בלי סימני קריאה."
+            "ברך את המשתמש בעברית במשפט אחד קצר ושקט. "
+            "בלי 'איזה כיף', בלי 'כל הכבוד', בלי 'אלוף', בלי 'אחי' או 'אחותי' — וגם בלי לוכסן בין צורות מגדריות. "
+            "ברירת המחדל: צורת זכר. בלי סימני קריאה. בלי אימוג'י. אותיות קטנות אם רלוונטי."
         )
+        if days_since is not None and days_since >= 3:
+            sys += f" עברו {days_since} ימים מאז שדיברנו — תאזכר את זה ברוגע, בלי דרמה."
     else:
         sys = (
-            "Greet the user in english with one short warm sentence, peer voice, no exclamation marks. "
-            f"It has been {days_since} days since the last session — mention it gently if it fits. "
-            "Lowercase, no emoji."
-            if days_since is not None and days_since >= 3
-            else "Greet the user in english with one short warm sentence, peer voice, no exclamation marks. Lowercase."
+            "Greet the user in english with one short, quiet sentence. "
+            "No 'great to see you', no 'amazing', no 'champion' — peer voice, not coach. "
+            "No exclamation marks. No emoji. Lowercase."
         )
+        if days_since is not None and days_since >= 3:
+            sys += f" It has been {days_since} days since we talked — mention it calmly if it fits."
     text = await _llm_short(sys, "(generate the greeting now)", max_tokens=50)
     return text or _greet_fallback(language, days_since)
 
@@ -185,13 +185,14 @@ async def _llm_greet(language: Language, days_since: int | None) -> str:
 async def _llm_carryover_question(task_title: str, language: Language) -> str:
     if language == "he":
         sys = (
-            "אתה שואל את המשתמש בעדינות אם הוא ביצע משימה ספציפית. "
-            "משפט אחד, בלי סימני קריאה, בלי 'איך הולך', בלי שיפוטיות."
+            "שאל את המשתמש בקצרה אם הוא ביצע משימה ספציפית. "
+            "משפט אחד, בלי סימני קריאה, בלי 'איך הולך', בלי שיפוטיות. "
+            "בלי לוכסן בין צורות זכר/נקבה — תשתמש בצורת זכר ברירת מחדל. בלי 'אחי'/'אחותי'."
         )
         user = f"שם המשימה: {task_title}"
     else:
         sys = (
-            "Ask the user gently whether they did a specific task. "
+            "Ask the user briefly whether they did a specific task. "
             "One sentence, no exclamation marks, no 'how's it going', no judgment."
         )
         user = f"task: {task_title}"
@@ -253,8 +254,9 @@ async def _llm_confirm(titles: list[str], language: Language) -> str:
     plain = ", ".join(titles)
     if language == "he":
         sys = (
-            "סכם את התכנית להיום במשפט אחד או שניים, בקול רגוע של חבר. "
-            "אל תוסיף עידוד מוגזם. אל תוסיף סימני קריאה. אל תוסיף 'אתה יכול'."
+            "סכם את התכנית להיום במשפט אחד או שניים, קצר ושקט. "
+            "בלי עידוד, בלי 'אתה יכול', בלי 'מדהים'. בלי לוכסן בין צורות מגדריות; "
+            "תשתמש בצורת זכר כברירת מחדל. בלי סימני קריאה."
         )
         user = f"המשימות להיום: {plain}"
     else:
@@ -326,6 +328,10 @@ def _days_since(prior_session_at: str | None) -> int | None:
 async def step_greet(
     *, sb: Client, user_id: str, session_id: str, language: Language
 ) -> StepResult:
+    """Open the planning session. Uses STATIC strings (no LLM) so the user
+    can start typing within ~200ms instead of waiting 1-3 s for the local
+    model to generate a greeting. Personalization (days-since-last-session)
+    is preserved via the fallback templates."""
     prior = (
         sb.table("sessions")
         .select("started_at")
@@ -338,12 +344,17 @@ async def step_greet(
         or []
     )
     days = _days_since(prior[0]["started_at"]) if prior else None
-    greeting = await _llm_greet(language, days)
+    greeting = _greet_fallback(language, days)
 
     carryovers = _load_carryovers(sb, user_id)
     if carryovers:
         first = carryovers[0]
-        question = await _llm_carryover_question(first["title"], language)
+        # Static carryover question — same template the LLM-fallback used.
+        question = (
+            f"מה לגבי \"{first['title']}\"?"
+            if language == "he"
+            else f"what about \"{first['title']}\"?"
+        )
         return StepResult(
             assistant_reply=f"{greeting} {question}",
             next_step=STEP_REVIEW,
@@ -403,7 +414,13 @@ async def step_review_carryover(
     next_idx = idx + 1
     if next_idx < len(carryovers):
         nxt = carryovers[next_idx]
-        question = await _llm_carryover_question(nxt["title"], language)
+        # Static template — same shape the LLM fallback used. Skipping the LLM
+        # call here keeps each carryover-review turn snappy (~200ms vs 1-3s).
+        question = (
+            f"מה לגבי \"{nxt['title']}\"?"
+            if language == "he"
+            else f"what about \"{nxt['title']}\"?"
+        )
         return StepResult(
             assistant_reply=f"{ack} {question}",
             next_step=STEP_REVIEW,

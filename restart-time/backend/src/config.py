@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     enable_reminders: bool = False
     enable_planning_flow: bool = True
 
+    # Dev bypass — when set, the auth dependency returns this user_id and
+    # skips JWT verification entirely. Use only for local demos. The user
+    # MUST already exist in auth.users (Supabase) for FKs to resolve.
+    dev_user_id: str | None = None
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

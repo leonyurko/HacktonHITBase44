@@ -49,7 +49,7 @@ const STRINGS = {
     enterEmail: 'מייל',
     sendLink: 'שלח לי קישור',
     linkSent: 'תבדוק את המייל. שלחנו קישור.',
-    signOut: 'יציאה',
+    signOut: 'התנתקות',
     modePicker: {
       hi: 'היי.',
       planMyDay: 'בוא נתכנן',
@@ -58,7 +58,7 @@ const STRINGS = {
       noTasks: 'אין כלום עדיין. נתחיל בדבר אחד.',
     },
     chat: {
-      placeholder: 'תכתוב או תחזיק את המיקרופון',
+      placeholder: 'כתוב, או תחזיק לדבר',
       hold: 'תחזיק כדי לדבר',
       send: 'שלח',
       cancel: 'ביטול',
@@ -67,18 +67,18 @@ const STRINGS = {
       networkIssue: 'לא הצלחנו להתחבר. ננסה שוב כשתרצה.',
     },
     grounding: {
-      label: 'רגיעה',
-      whenReady: 'אני כאן',
+      label: 'עוגן',
+      whenReady: 'חזרה',
     },
     settings: {
       title: 'הגדרות',
       language: 'שפה',
-      voiceAutoplay: 'נגן קול אוטומטית',
-      ttsMode: 'מתי לדבר בחזרה',
+      voiceAutoplay: 'השמעה אוטומטית',
+      ttsMode: 'תגובות קוליות',
       always: 'תמיד',
-      voiceTurnsOnly: 'רק כשאני מדבר',
+      voiceTurnsOnly: 'רק אחרי שדיברתי',
       never: 'אף פעם',
-      quietVisual: 'מצב שקט',
+      quietVisual: 'מצב חזותי שקט',
     },
     progress: {
       thisMonth: 'החודש',

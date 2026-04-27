@@ -1,138 +1,142 @@
-/* Design tokens — adapted from Stitch's mindful_focus_companion design,
-   reconciled with our trauma-informed rules.
+/* Restart Time — design tokens, v2.
+   Palette: light blue (תכלת) primary, lilac purple (סגול לילך) secondary.
+   Soft, rounded, warm. Custom mascot lives in the UI for completion feedback.
 
-   See PRD §7 for the binding trauma rules; this file is where they live.
-
-   Differences from raw Stitch export:
-   - "error" red is REPLACED with our muted clay. The Help button and any
-     error states use the warm tertiary palette instead. PTSD users find
-     red triggering and we don't want urgency cues.
-   - All other Stitch tokens preserved (sage greens, warm clay, off-white surfaces).
-*/
+   Reference inspiration: pastel-care apps (mood trackers) but uniquely tinted
+   for our peer-recovery context (calm, not childish). */
 
 :root {
-  /* === Stitch palette (light theme, default) ============================ */
-  --bg:                       #fcf9f8;  /* surface / background */
-  --bg-elevated:              #f6f3f2;  /* surface-container-low */
-  --surface-container:        #f0eded;
-  --surface-container-high:   #eae7e7;
-  --surface-variant:          #e4e2e1;
+  /* === Surfaces — very pale blue-tinted whites ===================== */
+  /* Page bg is a pastel sky-blue so white cards pop against it. */
+  --bg:                       #EAF2F9;  /* page background */
+  --bg-elevated:              #FFFFFF;  /* cards on the page */
+  --surface-container:        #F4F7FB;  /* subtle blue-grey for grouped surfaces */
+  --surface-container-high:   #E2EBF4;  /* hover / active rows */
+  --surface-variant:          #D6E2EE;  /* progress-bar track, subtle dividers */
 
-  --text:                     #1b1c1c;  /* on-surface */
-  --text-muted:               #424841;  /* on-surface-variant */
-  --text-subtle:              #737970;  /* outline */
-  --border:                   #c2c8bf;  /* outline-variant */
+  --text:                     #2A3340;  /* deep blue-grey, not pure black */
+  --text-muted:               #6B7785;
+  --text-subtle:              #9BA5B2;
+  --border:                   #D5DEE8;
 
-  /* Primary (deep sage) — actions, links, focus rings */
-  --primary:                  #476648;
-  --on-primary:               #ffffff;
-  --primary-container:        #c8ecc6;  /* primary-fixed */
-  --on-primary-container:     #143219;
+  /* === Primary — תכלת (sky blue) ==================================== */
+  --primary:                  #5BA3D0;  /* deeper sky for buttons / brand */
+  --primary-hover:            #4D92BD;
+  --primary-container:        #BFDDEE;  /* light-blue chip / pill bg */
+  --primary-pale:             #E6F2F9;  /* very pale wash */
+  --on-primary:               #FFFFFF;
+  --on-primary-container:     #1F4A66;
 
-  /* Secondary (warm sand) */
-  --secondary:                #76593a;
-  --secondary-container:      #fdd6af;
-  --on-secondary-container:   #785b3c;
+  /* === Secondary — סגול לילך (lilac purple) ========================= */
+  --secondary:                #B695C9;
+  --secondary-hover:          #A480BB;
+  --secondary-container:      #DCC5E5;
+  --secondary-pale:           #F2EAF7;
+  --on-secondary:             #FFFFFF;
+  --on-secondary-container:   #4F345E;
 
-  /* Tertiary (warm clay) — replaces red error visually for the help button + grounding fab */
-  --tertiary:                 #80543b;
-  --on-tertiary:              #ffffff;
-  --tertiary-container:       #bb876b;
-  --on-tertiary-container:    #45220e;
-  --tertiary-fixed:           #ffdbca;
-  --on-tertiary-fixed:        #311302;
+  /* === Tertiary — soft warm peach for celebratory moments =========== */
+  --tertiary:                 #E8B49B;
+  --tertiary-container:       #F5D9C8;
+  --on-tertiary:              #FFFFFF;
+  --on-tertiary-container:    #5C3A2A;
+  --tertiary-fixed:           #FFE7D6;
 
-  /* === Trauma-informed semantic accents (preserved from PRD §7.1) ======= */
-  /* "Good" / completed — uses Stitch's primary-container */
-  --accent-good:              #7a9b7a;
-  /* Level-up / soft amber */
-  --accent-amber:             #C9A861;
-  /* Errors — muted clay, NEVER red. Override Stitch's #ba1a1a. */
-  --accent-error:             #B86A4D;
+  /* === Semantic accents (preserved trauma-aware constraint: no red) === */
+  --accent-good:              #7BC9A3;  /* mint — completed */
+  --accent-amber:             #F0C868;  /* gold — sparkle / level-up */
+  --accent-error:             #E89A8B;  /* coral, never bright red */
 
-  /* === Typography ====================================================== */
-  /* UI / headings */
+  /* === Typography ===================================================== */
   --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  /* Body (calming serif — distinctive of this design) */
+  /* Body: keep Noto Serif for calm reading rhythm in the chat */
   --font-body:    'Noto Serif', Georgia, "Times New Roman", serif;
-  /* Hebrew falls back to Heebo (sans, available system-wide on most platforms) */
   --font-hebrew:  'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --text-base:   17px;
   --text-lg:     19px;
-  --text-h2:     28px;
-  --text-h1:     34px;
+  --text-h2:     26px;
+  --text-h1:     32px;
   --text-caption: 15px;
   --text-label:  14px;
-
   --line-height: 1.6;
 
-  /* === Motion (trauma rules: no springs, no loops, ≤250ms) ============== */
-  --motion-duration: 200ms;
+  /* === Motion (trauma rules: no springs, no loops, ≤350ms) ============ */
+  --motion-duration: 220ms;
   --motion-ease:     cubic-bezier(0.4, 0.0, 0.2, 1);
+  /* Slightly bouncier ease for cute completion feedback only */
+  --motion-pop:      cubic-bezier(0.34, 1.30, 0.64, 1);
+  --motion-pop-duration: 380ms;
 
-  /* === Spacing (4px unit; Stitch's named scale) ========================= */
+  /* === Spacing (4px base) ============================================ */
   --space-unit: 4px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-8:    32px;
   --space-xs:   8px;
   --space-sm:   16px;
   --space-md:   24px;
   --space-lg:   40px;
   --space-xl:   64px;
-  --space-margin: 24px;
+  --space-margin: 20px;
 
-  /* Legacy aliases (we still reference these in older components) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-8: 48px;
-
-  /* === Radii (Stitch scale) ============================================ */
-  --radius-sm: 0.25rem;   /* 4px */
-  --radius-md: 0.5rem;    /* 8px */
-  --radius-lg: 0.75rem;   /* 12px */
-  --radius-xl: 1rem;      /* 16px */
+  /* === Radii — significantly rounder than v1 ========================= */
+  --radius-sm:   10px;
+  --radius-md:   16px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-2xl:  36px;
   --radius-full: 9999px;
 
-  /* Tap targets */
+  /* === Shadows — soft, blue-tinted =================================== */
+  --shadow-sm: 0 1px 3px rgba(91, 163, 208, 0.08), 0 1px 2px rgba(91, 163, 208, 0.04);
+  --shadow-md: 0 4px 14px rgba(91, 163, 208, 0.10), 0 2px 4px rgba(91, 163, 208, 0.04);
+  --shadow-lg: 0 8px 28px rgba(91, 163, 208, 0.14);
+
+  /* === Tap targets / chrome heights ================================== */
   --tap-min: 56px;
-
-  /* Top + bottom chrome heights — content padded around them */
   --topbar-height:    64px;
-  --bottomnav-height: 72px;
+  --bottomnav-height: 76px;
 }
 
-/* === Dark theme (Stitch dark) =========================================== */
+/* === Dark theme — deep slate with blue-tinted text ==================== */
 [data-theme="dark"] {
-  --bg:                       #1B1F26;
-  --bg-elevated:              #232831;
-  --surface-container:        #232831;
-  --surface-container-high:   #2c323d;
-  --surface-variant:          #3A3F49;
+  --bg:                       #181D26;
+  --bg-elevated:              #232936;
+  --surface-container:        #232936;
+  --surface-container-high:   #2C3340;
+  --surface-variant:          #3A4250;
 
-  --text:                     #E8E2D6;
-  --text-muted:               #b8b3a6;
-  --text-subtle:              #8c8775;
-  --border:                   #3A3F49;
+  --text:                     #E5EBF2;
+  --text-muted:               #B0B9C5;
+  --text-subtle:              #8C95A1;
+  --border:                   #3A4250;
 
-  --primary:                  #adcfac;
-  --on-primary:               #03210a;
-  --primary-container:        #304e32;
-  --on-primary-container:     #c8ecc6;
+  --primary:                  #92C4DF;
+  --primary-hover:            #A8D2E8;
+  --primary-container:        #1F4A66;
+  --on-primary:               #08293D;
+  --on-primary-container:     #BFDDEE;
 
-  --tertiary:                 #f4ba9c;
-  --on-tertiary:              #311302;
-  --tertiary-container:       #653d26;
-  --on-tertiary-container:    #ffdbca;
+  --secondary:                #C8AED8;
+  --secondary-container:      #4F345E;
+  --on-secondary:             #2A1F35;
+  --on-secondary-container:   #DCC5E5;
 
-  --accent-good:              #94B594;
-  --accent-amber:             #D9BD7C;
-  --accent-error:             #D08366;
+  --tertiary:                 #ECC8B3;
+  --tertiary-container:       #5C3A2A;
+  --on-tertiary:              #2A1A0F;
+  --on-tertiary-container:    #F5D9C8;
+
+  --accent-good:              #93D6B5;
+  --accent-amber:             #F2D079;
+  --accent-error:              #EFAEA0;
 }
 
-/* Quiet visual mode disables motion entirely */
 [data-quiet="true"] * {
   animation: none !important;
   transition: none !important;
