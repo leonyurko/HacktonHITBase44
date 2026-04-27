@@ -117,7 +117,12 @@ export default function App() {
           <Dashboard
             settings={settings}
             progress={progress}
-            onPlan={() => setView('planning')}
+            // Plan button leads to the on-demand conversational chat —
+            // the LLM-driven path with prior-turn context, task
+            // decomposition, and inline-action markers. The deterministic
+            // planning state machine remains in the codebase but isn't
+            // exposed in the UI right now.
+            onPlan={() => setView('on_demand')}
           />
         )}
         {view === 'health' && <HealthView language={language} />}
