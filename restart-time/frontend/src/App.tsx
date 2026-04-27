@@ -4,7 +4,9 @@ import { onAuthChange, getCurrentSession } from './core/auth';
 import { apiGet, apiPatch } from './core/api';
 import type { Language, UserSettings, Progress } from './core/types';
 import MagicLink from './components/auth/MagicLink';
+import CommunityView from './components/modes/CommunityView';
 import Dashboard from './components/modes/Dashboard';
+import HealthView from './components/modes/HealthView';
 import LeaderboardView from './components/modes/LeaderboardView';
 import OnDemandView from './components/modes/OnDemandView';
 import PlanningView from './components/modes/PlanningView';
@@ -14,7 +16,14 @@ import TopAppBar from './components/ui/TopAppBar';
 import BottomNav, { type NavTab } from './components/ui/BottomNav';
 import { CelebrateProvider } from './core/feedback';
 
-type View = 'dashboard' | 'leaderboard' | 'settings' | 'on_demand' | 'planning';
+type View =
+  | 'dashboard'
+  | 'health'
+  | 'community'
+  | 'leaderboard'
+  | 'settings'
+  | 'on_demand'
+  | 'planning';
 
 // Dev bypass: when VITE_DEV_BYPASS=true, the magic-link screen is skipped
 // and the app is rendered as if the user were signed in. The backend MUST
@@ -80,6 +89,8 @@ export default function App() {
   const navTab: NavTab =
     view === 'settings' ? 'settings' :
     view === 'leaderboard' ? 'leaderboard' :
+    view === 'health' ? 'health' :
+    view === 'community' ? 'community' :
     'home';
 
   async function toggleLang() {
@@ -109,6 +120,8 @@ export default function App() {
             onPlan={() => setView('planning')}
           />
         )}
+        {view === 'health' && <HealthView language={language} />}
+        {view === 'community' && <CommunityView language={language} />}
         {view === 'leaderboard' && (
           <LeaderboardView
             language={language}
@@ -141,6 +154,8 @@ export default function App() {
           onChange={(t) => {
             if (t === 'settings') setView('settings');
             else if (t === 'leaderboard') setView('leaderboard');
+            else if (t === 'health') setView('health');
+            else if (t === 'community') setView('community');
             else setView('dashboard');
           }}
         />
