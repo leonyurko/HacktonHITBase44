@@ -136,6 +136,58 @@ _NO_MORE_PATTERNS_HE = [
     r"כלום",
 ]
 
+# "By the way, add X" patterns. When the user mentions a NEW task during
+# carryover review (instead of answering about the carryover), we capture
+# the task title from group 1 and append it.
+_NEW_TASK_TRIGGERS_EN = [
+    r"\bremind\s+me\s+to\s+(.+)",
+    r"\bdon'?t\s+let\s+me\s+forget\s+to\s+(.+)",
+    r"\bi\s+(also\s+)?need\s+to\s+(.+)",  # group 2
+    r"\badd\s+(?:a\s+task\s+)?(?:to\s+)?(.+)",
+]
+_NEW_TASK_TRIGGERS_HE = [
+    r"תזכיר\s+לי\s+(.+)",
+    r"תזכרי\s+לי\s+(.+)",
+    r"אל\s+תיתן\s+לי\s+לשכוח\s+(.+)",
+    r"תוסיף\s+(?:לרשימה\s+)?(.+)",
+    r"צריך\s+(?:גם\s+)?ל(.+)",  # "need to <X>" — captures verb+rest
+    r"גם\s+(?:צריך|רוצה)\s+ל?(.+)",
+]
+
+
+def _extract_new_task(text: str, language: Language) -> str | None:
+    """If the message looks like 'remind me to X', return the captured X.
+
+    None if nothing matches. The captured title is trimmed of trailing
+    punctuation and time tails like 'in 1 hour' / 'עוד שעה'.
+    """
+    patterns = _NEW_TASK_TRIGGERS_HE if language == "he" else _NEW_TASK_TRIGGERS_EN
+    for p in patterns:
+        m = re.search(p, text, re.IGNORECASE)
+        if not m:
+            continue
+        # Take the LAST captured group (handles patterns with optional groups).
+        groups = [g for g in m.groups() if g]
+        if not groups:
+            continue
+        title = groups[-1].strip().strip(".,!?")
+        if not title:
+            continue
+        # Strip trailing time hints — they're already in the user's words but
+        # the title doesn't need to carry them.
+        title = re.sub(
+            r"\s+(in\s+(?:an?|\d+|few)\s*(min|minute|hour|hr|h|day|d)s?|"
+            r"later|tonight|tomorrow|this\s+(morning|afternoon|evening)|"
+            r"עוד\s+\S+|מחר|הערב|בערב|בבוקר|אחר\s+הצהריים)\s*$",
+            "",
+            title,
+            flags=re.IGNORECASE,
+        ).strip()
+        if len(title) < 3:
+            continue
+        return title
+    return None
+
 
 def _matches_any(text: str, patterns: list[str]) -> bool:
     return any(re.search(p, text, re.IGNORECASE) for p in patterns)
@@ -446,6 +498,18 @@ async def step_review_carryover(
     elif intent == "drop":
         changes.append(TaskChange(op="drop", task_id=current["id"]))
     # 'still_open': no change, task stays as-is and naturally surfaces tomorrow.
+
+    # Side-channel: the user might also have mentioned a NEW task in this
+    # message ("remind me to take out the trash"). Catch it and queue a
+    # create alongside the primary intent. Doesn't override the carryover ack
+    # — just appends to it.
+    new_title = _extract_new_task(user_message, language)
+    if new_title:
+        changes.append(TaskChange(op="create", title=new_title))
+        if language == "he":
+            ack = f"{ack} שמרתי גם \"{new_title}\" לרשימה."
+        else:
+            ack = f"{ack} also saved \"{new_title}\" to the list."
 
     next_idx = idx + 1
     if next_idx < len(carryovers):
