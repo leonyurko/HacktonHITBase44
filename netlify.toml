@@ -1,0 +1,18 @@
+# Netlify config — hosts the React frontend only.
+# The Python FastAPI backend is NOT hosted on Netlify; it must be reachable
+# at the URL set in VITE_API_BASE_URL (env var below).
+
+[build]
+  base = "restart-time/frontend"
+  publish = "dist"
+  command = "npm install && npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback — any non-asset path serves index.html so client-side routing
+# (and a hard refresh on the dashboard etc.) works.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
